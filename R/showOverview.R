@@ -32,6 +32,9 @@ showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
   # divide circRNA into four class:
   # intergenic exon-intron exon intron
   genomegff <- read.csv(genomegff, sep = "	", header = FALSE)
+  
+  genomegff <- filter(gff,str_extract(genomegff$V9,'[.]1;')=='.1;')
+  
   gene <- genomegff[genomegff$V3 == "gene", ]
   exon <- genomegff[genomegff$V3 == "exon", ]
   mRNA <- genomegff[genomegff$V3 == "mRNA", ]
