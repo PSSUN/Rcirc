@@ -23,6 +23,9 @@ classByType <- function(circbed, gff, file = "./result.csv") {
   # intergenic exon-intron exon intron
 
   genomegff <- read.csv(gff, sep = "	", header = FALSE)
+  
+  genomegff <- filter(gff,str_extract(genomegff$V9,'[.]1;')=='.1;')
+  
   gene <- genomegff[genomegff$V3 == "gene", ]
   exon <- genomegff[genomegff$V3 == "exon", ]
   mRNA <- genomegff[genomegff$V3 == "mRNA", ]
