@@ -49,7 +49,7 @@ circ_summary <- function(bamfile, gff) {
   # make ribo-seq reads Grange object
   ga <- readGAlignments(bamfile)
   read.gr <- granges(ga)
-  seqlevels(read.gr) <- "1" # bam 文件中的chr名和gff 文件中的chr名不统一
+  seqlevels(read.gr) <- "1" 
   seqnames(read.gr) <- sub("_CircularRNA", "", seqnames(read.gr))
 
   ## filter circRNA whose junction sites are spanned by reads
