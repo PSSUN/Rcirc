@@ -276,11 +276,3 @@ classByType <- function(circbed, gff, file = "./result.csv") {
   print("Finished! Thank you for using Rcirc.")
 }
 
-# 用户输入的circRNA的bed格式文件
-#circbed <- "/home/sun/1.bed"
-# 用户输入的基因组注释文件，不能包含‘#’行
-#gff <- "/home/sun/tair10.gff3"
-# 输出表格的路径
-#file <- "/home/sun/classified.csv"
-# 绘图参数
-# classByType(circbed = circbed, gff = gff, file = file)
