@@ -308,14 +308,6 @@ showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
   circos.clear()
 }
 
-###
-#bed <- "/home/sun/1.bed"
-#gff <- "/home/sun/tair10.gff3"
-#ribo <- "/home/sun/sps/transcript_tranlate/Ribo-seq-merge.bed"
-#rna <- "/home/sun/sps/transcript_tranlate/RNA-seq-merge.bed"
-### Fasta file:
-#genomefasta <- "/home/sun/tair10.nomt.fa"
-###
 #showOverview(circbed = bed,
 #             gff = gff,
 #             genomefasta = genomefasta,
