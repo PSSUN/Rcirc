@@ -15,7 +15,7 @@ showDistribution <- function(gbed, cbed) {
   # divide circRNA into four class:
   # intergenic exon-intron exon intron
   genomegff <- read.table(gbed, sep = '\t')
-  genomegff <- filter(genomegff,str_extract(gff$V9,'[.]1;')=='.1;')
+  # genomegff <- filter(genomegff,str_extract(gff$V9,'[.]1;')=='.1;')
   gene <- genomegff[genomegff$V3 == "gene", ]
   exon <- genomegff[genomegff$V3 == "exon", ]
   mRNA <- genomegff[genomegff$V3 == "mRNA", ]
