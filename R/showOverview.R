@@ -241,7 +241,7 @@ showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
       width = windowSize
     )
     end(ran[length(ran)]) <- width(total_genome[i])
-    totalgenome_bins <- GRanges(seqnames = rep(chrLabels, length(ran)), ranges = ran, strand = "*") # 将全基因组划为窗口
+    totalgenome_bins <- GRanges(seqnames = rep(chrLabels, length(ran)), ranges = ran, strand = "*")
     bins_seq <- getSeq(
       FaFile(genomefasta),
       totalgenome_bins
