@@ -168,13 +168,6 @@ showDistribution <- function(gbed, cbed) {
     scale_fill_brewer(palette = "Set2") +
     theme(
       plot.title = element_text(hjust = 0.5)
-      # +scale_fill_discrete(limits=c('intergenic_intron_circRNA',
-      #                              'intergenic_exon_circRNA',
-      #                              'intergenic_circRNA',
-      #                              'same_exon_circRNA',
-      #                              'different_exon_circRNA',
-      #                              'intron_circRNA',
-      #                              'exon_intron_circRNA')
     )
 }
 
