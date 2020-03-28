@@ -12,7 +12,6 @@ showDistribution <- function(gbed, cbed) {
   bed <- read.csv(cbed, header = FALSE)
   # divide circRNA into four class:
   # intergenic exon-intron exon intron
-  # '/Users/sunpeisen/tair10.gff3'
   genomegff <- read.csv(gbed, sep = "	", header = FALSE)
   gene <- genomegff[genomegff$V3 == "gene", ]
   exon <- genomegff[genomegff$V3 == "exon", ]
