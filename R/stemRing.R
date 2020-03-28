@@ -14,7 +14,6 @@
 stemRing <- function(circbed, genomefasta, out, len =1000) {
   ttt <- read.csv(circbed, sep = "\t", header = F)
   c <- data.frame(V1 = ttt$V1, V2 = ttt$V2, V3 = ttt$V3)
-  # circbed <- read.csv("/Users/sunpeisen/Downloads/bed", sep = "	", header = FALSE)
   circbed <- c
   circbed$V1 <- gsub(circbed$V1, pattern = "Chr", replacement = "")
   circbed$V1 <- gsub(circbed$V1, pattern = "chr", replacement = "")
@@ -112,7 +111,3 @@ stemRing <- function(circbed, genomefasta, out, len =1000) {
 }
 
 
-#circbed <- "/home/sun/tair10.circRNA.bed"
-#genomefasta <- "/home/sun/sps/02_data/Arabidopsis_thaliana/Hsu_PY/tair10.fa"
-#out <- "/home/sun/MoreThan_150.csv"
-#stemRing(circbed, genomefasta, out)
