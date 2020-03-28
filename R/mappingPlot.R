@@ -302,21 +302,3 @@ showMapping <-
     return(p)
   }
 
-# fa <- "/Users/alexwang/r_env/rCirc/newGenome.fa"
-
-# result from rCirc.R result
-
-
-# fa <- "/Users/sunpeisen/Downloads/newGenome.fa"
-#
-# p <- showMapping(
-#   summary = res,
-#   circ_index = 43,
-#   genomefile = fa,
-#   upstream = 100,
-#   downstream = 100,
-#   style = "aside"
-# )
-
-# 22 23 28 43
-# 26 36 37
