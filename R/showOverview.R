@@ -308,9 +308,3 @@ showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
   circos.clear()
 }
 
-#showOverview(circbed = bed,
-#             gff = gff,
-#             genomefasta = genomefasta,
-#             ribo = ribo,
-#             rna = rna)
-
