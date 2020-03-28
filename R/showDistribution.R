@@ -4,6 +4,8 @@
 ##' @import grid
 ##' @import gtable
 ##' @import ggplot2
+##' @import dyplr
+##' @import stringr
 ##' @param gbed The genome annotation file: gtf or gff3
 ##' @param cbed The circRNA bed file
 
@@ -12,7 +14,8 @@ showDistribution <- function(gbed, cbed) {
   bed <- read.csv(cbed, header = FALSE)
   # divide circRNA into four class:
   # intergenic exon-intron exon intron
-  genomegff <- read.csv(gbed, sep = "	", header = FALSE)
+  genomegff <- read.table(gbed, sep = '\t')
+  genomegff <- filter(genomegff,str_extract(gff$V9,'[.]1;')=='.1;')
   gene <- genomegff[genomegff$V3 == "gene", ]
   exon <- genomegff[genomegff$V3 == "exon", ]
   mRNA <- genomegff[genomegff$V3 == "mRNA", ]
