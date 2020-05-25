@@ -2,8 +2,8 @@
 ##' @import Biostrings
 ##' @author Peisen Sun
 
-##' @export trandomSeq
-trandomSeq <- function(fastaIn, fastaOut, gffOut, Nnum = 200) {
+##' @export makeGenome
+makeGenome <- function(fastaIn, fastaOut, gffOut, Nnum = 200) {
   seqs <- readDNAStringSet(filepath = fastaIn, format = "fasta")
   Nnum <- Nnum
   N <- ""
@@ -83,4 +83,4 @@ trandomSeq <- function(fastaIn, fastaOut, gffOut, Nnum = 200) {
 # gffOut <- "/home/sun/Rcirc/test.gff"
 # fastaOut <- "/home/sun/Rcirc/test.fa"
 
-# trandomSeq(fastaIn, fastaOut, gffOut)
+# makeGenome(fastaIn, fastaOut, gffOut)
