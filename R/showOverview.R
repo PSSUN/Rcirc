@@ -34,7 +34,7 @@ showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
   genomegff <- read.csv(genomegff, sep = "	", header = FALSE)
   
   # Extract the first transcript to culculate
-  genomegff <- filter(gff,str_extract(genomegff$V9,'[.]1;')=='.1;')
+  genomegff <- filter(genomegff,str_extract(genomegff$V9,'[.]1;')=='.1;')
   
   gene <- genomegff[genomegff$V3 == "gene", ]
   exon <- genomegff[genomegff$V3 == "exon", ]
