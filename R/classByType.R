@@ -1,9 +1,4 @@
-library(circlize)
-library(GenomicRanges)
-library(IRanges)
-library(stringr)
-library(dplyr)
-library(RColorBrewer)
+
 
 ###
 ##' @export

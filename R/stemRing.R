@@ -1,7 +1,3 @@
-# library(IRanges)
-# library(GenomicRanges)
-# library(Biostrings)
-# library(dplyr)
 
 ##' @export
 ##' @author Sun Peisen

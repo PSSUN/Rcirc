@@ -4,7 +4,6 @@
 ##' @import grid
 ##' @import gtable
 ##' @import ggplot2
-##' @import dyplr
 ##' @import stringr
 ##' @param gbed The genome annotation file: gtf or gff3
 ##' @param cbed The circRNA bed file

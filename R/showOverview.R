@@ -1,11 +1,3 @@
-# library(GenomicRanges)
-# library(IRanges)
-# library(stringr)
-# library(dplyr)
-# library(circlize)
-# library(RColorBrewer)
-# library(Biostrings)
-# library(Rsamtools)
 
 ##' @export
 ##' @import ggplot2
