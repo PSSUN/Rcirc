@@ -7,9 +7,6 @@ showCodon <- function(x) {
   circ <- readDNAStringSet(x)
   
   codon <- trinucleotideFrequency(circ)
-  data(HNF4alpha)
-  a <- HNF4alpha
-  codon <- trinucleotideFrequency(a)
   codon <- data.frame(codon)
   codon <- apply(codon, MARGIN = 2, sum)
   codon <- sort(x, decreasing = TRUE)
