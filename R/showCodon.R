@@ -5,6 +5,7 @@
 
 showCodon <- function(x) {
 circ <- readDNAStringSet(x)
+
 codon <- trinucleotideFrequency(circ)
 codon <- data.frame(codon)
 codon <- apply(codon, MARGIN = 2, sum)
@@ -17,6 +18,10 @@ ggplot(codon) +
   geom_bar(stat = "identity", aes(x = x, y = y), fill = "lightblue") +
   coord_flip() + scale_x_discrete(limits = rev(x)) +
   labs(title = "Distribution of 3-nt pattern", x = "Type", y = "Count") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.background = element_blank())+
+  scale_y_continuous(expand = c(0,0))
 
 }
