@@ -10,47 +10,59 @@
 ##' @param genomefasta genome fasta file
 
 showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
-  print("Make sure that the chromosomal information of your two annotation files is corresponding, and the non-corresponding chromosomalinformation will cause an error.")
-  genomegff <- gff
-  ribo <- read.csv(ribo, sep = "\t", header = FALSE)
-  rna <- read.csv(rna, sep = "\t", header = FALSE)
-  ribo <- ribo
-  rna <- rna
-  bed <- read.csv(bed, sep = "	", col.names = c("Chr", "Start", "End"))
-  total_genome <- readDNAStringSet(genomefasta, format = "fasta")
+  message("Make sure that the chromosomal information of your two annotation files is corresponding, and the non-corresponding chromosomalinformation will cause an error.")
+  ribo <- read.delim(ribo, header = FALSE)
+  rna <- read.delim(rna, header = FALSE)
+  bed <- read.delim(circbed,
+    header = FALSE,
+    stringsAsFactors = FALSE
+  )
+  if (ncol(bed) < 3) {
+    stop("circbed must contain at least three columns (Chr, Start, End).")
+  }
+  colnames(bed)[1:3] <- c("Chr", "Start", "End")
+  if (ncol(bed) >= 4) {
+    colnames(bed)[4] <- "Name"
+  } else {
+    bed$Name <- paste0("circ_", seq_len(nrow(bed)))
+  }
+  total_genome <- Biostrings::readDNAStringSet(genomefasta, format = "fasta")
   windowSize <- 50000
 
 
   # divide circRNA into four class:
   # intergenic exon-intron exon intron
-  genomegff <- read.csv(genomegff, sep = "	", header = FALSE)
+  genomegff <- read.delim(gff,
+    header = FALSE,
+    comment.char = "#",
+    stringsAsFactors = FALSE
+  )
   
   # Extract the first transcript to culculate
-  genomegff <- filter(genomegff,str_extract(genomegff$V9,'[.]1;')=='.1;')
+  genomegff <- dplyr::filter(genomegff, stringr::str_extract(genomegff$V9, "[.]1;") == ".1;")
   
   gene <- genomegff[genomegff$V3 == "gene", ]
   exon <- genomegff[genomegff$V3 == "exon", ]
-  mRNA <- genomegff[genomegff$V3 == "mRNA", ]
 
   gene <- data.frame(gene$V1, gene$V4, gene$V5, gene$V9)
-  id <- sapply(gene$gene.V9, function(x) str_match(as.character(x), "gene:(.*?);")[, 2])
+  id <- sapply(gene$gene.V9, function(x) stringr::str_match(as.character(x), "gene:(.*?);")[, 2])
   gene$gene.V9 <- id
 
   exon <- data.frame(exon$V1, exon$V4, exon$V5, exon$V9)
-  id2 <- sapply(exon$exon.V9, function(x) str_match(as.character(x), "exon_id=(.*?);")[, 2])
+  id2 <- sapply(exon$exon.V9, function(x) stringr::str_match(as.character(x), "exon_id=(.*?);")[, 2])
   exon$exon.V9 <- id2
 
-  tmp_chr <- sapply(bed$Chr, function(x) gsub("Chr", "", x))
+  tmp_chr <- bed$Chr
 
-  gr_gene <- GRanges(
+  gr_gene <- GenomicRanges::GRanges(
     seqnames = gene$gene.V1,
     meta = gene$gene.V9,
-    IRanges(start = gene$gene.V4, end = gene$gene.V5)
+    IRanges::IRanges(start = gene$gene.V4, end = gene$gene.V5)
   )
-  gr_exon <- GRanges(
+  gr_exon <- GenomicRanges::GRanges(
     seqnames = exon$exon.V1,
     meta = exon$exon.V9,
-    IRanges(start = exon$exon.V4, end = exon$exon.V5)
+    IRanges::IRanges(start = exon$exon.V4, end = exon$exon.V5)
   )
 
   # Find out the complement of gene and exon,
@@ -59,24 +71,33 @@ showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
   # set the meta information as 'intron'
   gr_intron$meta <- "intron"
 
-  gr_circ <- GRanges(
+  gr_circ <- GenomicRanges::GRanges(
     seqnames = tmp_chr,
     meta = bed$Name,
-    IRanges(
+    IRanges::IRanges(
       start = bed$Start,
       end = bed$End
     )
   )
 
   chromosome <- subset(genomegff, genomegff$V3 == "chromosome")
-  chromosome_gr <- GRanges(
+  chromosome_gr <- GenomicRanges::GRanges(
     seqnames = chromosome$V1,
     meta = chromosome$V3,
-    ranges = IRanges(
+    ranges = IRanges::IRanges(
       start = chromosome$V4,
       end = chromosome$V5
     )
   )
+  df <- data.frame(
+    name = chromosome$V1,
+    start = chromosome$V4,
+    end = chromosome$V5,
+    stringsAsFactors = FALSE
+  )
+  if (nrow(df) == 0) {
+    stop("No chromosome records found in the annotation file.")
+  }
   intergenic_gr <- GenomicRanges::setdiff(chromosome_gr, gr_gene)
 
   intergenic_gr$meta <- "intergenic"
@@ -85,50 +106,37 @@ showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
   total <- sort(total)
   total1 <- as.data.frame(total)
 
-  total <- distinct(total1)
-  total <- GRanges(
+  total <- dplyr::distinct(total1)
+  total <- GenomicRanges::GRanges(
     seqnames = total$seqnames,
     meta = total$meta,
-    IRanges(start = total$start, end = total$end)
+    IRanges::IRanges(start = total$start, end = total$end)
   )
-  total
   #####
-  circ_start <- GRanges(
+  circ_start <- GenomicRanges::GRanges(
     seqnames = tmp_chr,
     meta = bed$Name,
-    IRanges(start = bed$Start, end = bed$Start)
+    IRanges::IRanges(start = bed$Start, end = bed$Start)
   )
 
-  circ_end <- GRanges(
+  circ_end <- GenomicRanges::GRanges(
     seqnames = tmp_chr,
     meta = bed$Name,
-    IRanges(start = bed$End, end = bed$End)
+    IRanges::IRanges(start = bed$End, end = bed$End)
   )
   #############
   start <- findOverlaps(circ_start, total, select = "arbitrary")
   end <- findOverlaps(circ_end, total, select = "arbitrary")
   #############
-  circ_start
-  total
-
   gr_circ$left <- total[start]$meta
   gr_circ$right <- total[end]$meta
-  gr_circ
-  #####
-  start_info <- subsetByOverlaps(total, circ_start)
-  intersect(total, circ_start)
-  start_info
-  end_info <- subsetByOverlaps(total, circ_end)
-  end_info
   circ_data <- as.data.frame(gr_circ)
-  circ_data
   intron_circ <- subset(
     circ_data,
     circ_data$right == "intron" &
       circ_data$left == "intron"
   )
   intron_circ$type <- "intron_circRNA"
-  intron_circ
   interg_circ <- subset(
     circ_data,
     circ_data$right == "intergenic" &
@@ -137,10 +145,8 @@ showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
   interg_circ$type <- "intergenic_circRNA"
   interg_intron_circ <- subset(
     circ_data,
-    circ_data$right == "intergenic" &
-      circ_data$left == "intron" |
-      circ_data$left == "intergenic" &
-        circ_data$right == "intron"
+    (circ_data$right == "intergenic" & circ_data$left == "intron") |
+      (circ_data$left == "intergenic" & circ_data$right == "intron")
   )
   interg_intron_circ$type <- "intergenic_intron_circRNA"
 
@@ -162,19 +168,15 @@ showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
 
   exon_intron_circ <- subset(
     circ_data,
-    grepl("exon", circ_data$left) &
-      circ_data$right == "intron" |
-      grepl("exon", circ_data$right) &
-        circ_data$left == "intron"
+    (grepl("exon", circ_data$left) & circ_data$right == "intron") |
+      (grepl("exon", circ_data$right) & circ_data$left == "intron")
   )
   exon_intron_circ$type <- "exon_intron_circRNA"
 
   interg_exon_circ <- subset(
     circ_data,
-    grepl("exon", circ_data$left) &
-      circ_data$right == "intergenic" |
-      grepl("exon", circ_data$right) &
-        circ_data$left == "intergenic"
+    (grepl("exon", circ_data$left) & circ_data$right == "intergenic") |
+      (grepl("exon", circ_data$right) & circ_data$left == "intergenic")
   )
   interg_exon_circ$type <- "intergenic_exon_circRNA"
 
@@ -188,62 +190,84 @@ showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
     interg_intron_circ
   )
 
-
-
   cla_circ <- final_data
-
-  gene <- genomegff[genomegff$V3 == "gene", ]
-  exon <- genomegff[genomegff$V3 == "exon", ]
-  chr <- subset(genomegff, genomegff$V3 == "chromosome")
-  name <- chr$V1
-  start <- chr$V4
-  end <- chr$V5
-  c1 <- sample(colors(), length(name))
-  df <- data.frame(
-    name = name,
-    start = start,
-    end = end
-  )
-  tmp_chr <- sapply(bed$Chr, function(x) gsub("Chr", "", x))
+  if (nrow(cla_circ) == 0) {
+    stop("No circRNAs available after classification; nothing to plot.")
+  }
 
   bed1 <- data.frame(
     chr = cla_circ$seqnames,
     start = cla_circ$start,
     end = cla_circ$end,
     value = cla_circ$width,
-    type = cla_circ$type
+    type = cla_circ$type,
+    stringsAsFactors = FALSE
   )
 
-  bed1$type <- as.numeric(bed1$type)
-  newpalette <- colorRampPalette(brewer.pal(9, "Set3"))(length(levels(bed1$chr)))
-  c1 <- newpalette
-
+  bed1$type <- factor(
+    bed1$type,
+    levels = c(
+      "same_exon_circRNA",
+      "different_exon_circRNA",
+      "exon_intron_circRNA",
+      "intron_circRNA",
+      "intergenic_circRNA",
+      "intergenic_exon_circRNA",
+      "intergenic_intron_circRNA"
+    )
+  )
+  bed1$type_id <- as.integer(bed1$type)
+  bed1 <- bed1[!is.na(bed1$type_id), ]
+  if (nrow(bed1) == 0) {
+    stop("No circRNAs passed classification; nothing to plot.")
+  }
   bed1$value <- log(bed1$value, 2)
+
+  palette_length <- max(nrow(df), 1)
+  c1 <- colorRampPalette(brewer.pal(9, "Set3"))(palette_length)
 
   circos.par(gap.degree = 2, track.margin = c(0, 0))
 
   ######################################################################
 
   bedDF <- data.frame()
-  for (i in c(1:length(total_genome))) {
-    print(i)
-    chrLabels <- unlist(strsplit(names(total_genome[i]), " "))[1]
-    ran <- IRanges(
-      start = seq(1, width(total_genome[i]), by = windowSize),
+  genome_fa <- Rsamtools::FaFile(genomefasta)
+  Rsamtools::open(genome_fa)
+  on.exit(Rsamtools::close(genome_fa))
+  for (i in seq_along(total_genome)) {
+    seq_name <- names(total_genome)[i]
+    if (is.na(seq_name)) {
+      seq_name <- paste0("seq", i)
+    }
+    chr_label <- strsplit(seq_name, " ")[[1]][1]
+    seq_width <- Biostrings::width(total_genome[i])
+    ran <- IRanges::IRanges(
+      start = seq(1, seq_width, by = windowSize),
       width = windowSize
     )
-    end(ran[length(ran)]) <- width(total_genome[i])
-    totalgenome_bins <- GRanges(seqnames = rep(chrLabels, length(ran)), ranges = ran, strand = "*")
-    bins_seq <- getSeq(
-      FaFile(genomefasta),
+    IRanges::end(ran[length(ran)]) <- seq_width
+    totalgenome_bins <- GenomicRanges::GRanges(
+      seqnames = rep(chr_label, length(ran)),
+      ranges = ran,
+      strand = "*"
+    )
+    bins_seq <- Biostrings::getSeq(
+      genome_fa,
       totalgenome_bins
     )
-    GC_content <- (letterFrequency(bins_seq, "GC") / letterFrequency(bins_seq, "ATCG"))
-    tmpDF <- data.frame("chr" = i, "start" = ran@start, "end" = ran@start + ran@width - 1, "gc_content" = GC_content)
+    GC_content <- as.numeric(Biostrings::letterFrequency(bins_seq, "GC")) /
+      as.numeric(Biostrings::letterFrequency(bins_seq, "ATCG"))
+    tmpDF <- data.frame(
+      chr = chr_label,
+      start = IRanges::start(ran),
+      end = IRanges::end(ran),
+      gc_content = GC_content,
+      stringsAsFactors = FALSE
+    )
     bedDF <- rbind(bedDF, tmpDF)
   }
 
-  f2 <- colorRamp2(breaks = c(0.2, 0.8), colors = c("white", "red"))
+  f2 <- circlize::colorRamp2(breaks = c(0.2, 0.8), colors = c("white", "red"))
   #####################################################################
 
 
@@ -255,21 +279,20 @@ showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
   )
   circos.genomicTrackPlotRegion(bed1,
     ylim = c(min(bed1$value), max(bed1$value)),
-    numeric.column = c("value", "type"),
+    numeric.column = c("value", "type_id"),
     panel.fun = function(region, value, ...) {
-
-
-      col <- ifelse(value[[2]] == 7, "#FF6633",
-        ifelse(value[[2]] == 6, "#66FF99",
-          ifelse(value[[2]] == 5, "#33CCFF",
-            ifelse(value[[2]] == 4, "#009999",
-              ifelse(value[[2]] == 3, "#3366CC",
-                ifelse(value[[2]] == 2, "#6633FF", "#FFFF00")
-              )
-            )
-          )
-        )
+      type_palette <- c(
+        "#FFFF00",
+        "#6633FF",
+        "#3366CC",
+        "#009999",
+        "#33CCFF",
+        "#66FF99",
+        "#FF6633"
       )
+      idx <- value[[2]]
+      idx[is.na(idx)] <- 1
+      col <- type_palette[pmax(pmin(idx, length(type_palette)), 1)]
       circos.genomicPoints(region, value, col = col, cex = 0.2, pch = 16, numeric.column = c("value"))
     }, track.height = 0.2,
 #    circos.yaxis(side = 'left',at = seq(min(bed1$value),
@@ -284,7 +307,7 @@ showOverview <- function(circbed, gff, genomefasta, ribo, rna) {
 
   ### GC###
   # Genome annotation dataframe: genomegff
-  circos.genomicTrackPlotRegion(bedDF[, c("chr", "start", "end", "G.C")],
+  circos.genomicTrackPlotRegion(bedDF[, c("chr", "start", "end", "gc_content")],
     track.height = 0.1,
     panel.fun = function(region, value, ...) {
       circos.genomicRect(region, value,
